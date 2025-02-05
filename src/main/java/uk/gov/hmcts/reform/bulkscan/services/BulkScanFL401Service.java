@@ -9,10 +9,8 @@ import static uk.gov.hmcts.reform.bulkscan.constants.BulkScanConstants.POST_CODE
 import static uk.gov.hmcts.reform.bulkscan.constants.BulkScanConstants.SCAN_DOCUMENTS;
 import static uk.gov.hmcts.reform.bulkscan.constants.BulkScanConstants.YES;
 import static uk.gov.hmcts.reform.bulkscan.constants.BulkScanFl401Constants.APPLICANT_ADDRESS_POSTCODE;
-import static uk.gov.hmcts.reform.bulkscan.constants.BulkScanFl401Constants.APPLICANT_DATE_OF_BIRTH;
 import static uk.gov.hmcts.reform.bulkscan.constants.BulkScanFl401Constants.APPLICANT_DATE_OF_BIRTH_MESSAGE;
 import static uk.gov.hmcts.reform.bulkscan.constants.BulkScanFl401Constants.BAIL_CONDITION_END_DATE_MESSAGE;
-import static uk.gov.hmcts.reform.bulkscan.constants.BulkScanFl401Constants.RESPONDENT_BAIL_CONDITIONS_ENDDATE;
 import static uk.gov.hmcts.reform.bulkscan.constants.BulkScanFl401Constants.TEXT_AND_NUMERIC_MONTH_PATTERN;
 import static uk.gov.hmcts.reform.bulkscan.constants.BulkScanFl401Constants.VALID_DATE_WARNING_MESSAGE;
 import static uk.gov.hmcts.reform.bulkscan.helper.BulkScanTransformHelper.transformScanDocuments;
@@ -24,12 +22,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import uk.gov.hmcts.reform.bulkscan.clients.CourtFinderApi;
 import uk.gov.hmcts.reform.bulkscan.config.BulkScanFormValidationConfigManager;
 import uk.gov.hmcts.reform.bulkscan.config.BulkScanTransformConfigManager;
 import uk.gov.hmcts.reform.bulkscan.constants.BulkScanFl401Constants;
@@ -46,9 +49,12 @@ import uk.gov.hmcts.reform.bulkscan.model.BulkScanValidationResponse;
 import uk.gov.hmcts.reform.bulkscan.model.CaseCreationDetails;
 import uk.gov.hmcts.reform.bulkscan.model.FormType;
 import uk.gov.hmcts.reform.bulkscan.model.OcrDataField;
+import uk.gov.hmcts.reform.bulkscan.model.court.Court;
+import uk.gov.hmcts.reform.bulkscan.model.court.ServiceArea;
 import uk.gov.hmcts.reform.bulkscan.services.postcode.PostcodeLookupService;
 import uk.gov.hmcts.reform.bulkscan.utils.DateUtil;
 
+@Slf4j
 @NoArgsConstructor
 @AllArgsConstructor
 @Service
@@ -69,6 +75,8 @@ public class BulkScanFL401Service implements BulkScanService {
 
     @Autowired PostcodeLookupService postcodeLookupService;
 
+    @Autowired CourtFinderApi courtFinderApi;
+
     @Override
     public BulkScanValidationResponse validate(
             BulkScanValidationRequest bulkScanValidationRequest) {
@@ -88,7 +96,9 @@ public class BulkScanFL401Service implements BulkScanService {
         response.addWarning(
                 validateInputDate(
                         ocrDataFields,
-                        RESPONDENT_BAIL_CONDITIONS_ENDDATE,
+                        "respondentBailConditions_EndDate_Day",
+                        "respondentBailConditions_EndDate_Month",
+                        "respondentBailConditions_EndDate_Year",
                         BAIL_CONDITION_END_DATE_MESSAGE));
 
         bulkScanFL401ValidationService.validateApplicantRespondentRelationhip(
@@ -96,7 +106,10 @@ public class BulkScanFL401Service implements BulkScanService {
 
         response.addWarning(
                 validateInputDate(
-                        ocrDataFields, APPLICANT_DATE_OF_BIRTH, APPLICANT_DATE_OF_BIRTH_MESSAGE));
+                    ocrDataFields,
+                    "applicantDoB_DD",
+                    "applicantDoB_MM",
+                    "applicantDoB_YYYY", APPLICANT_DATE_OF_BIRTH_MESSAGE));
 
         response.addWarning(isValidPostCode(inputFieldMap, APPLICANT_ADDRESS_POSTCODE));
 
@@ -206,10 +219,6 @@ public class BulkScanFL401Service implements BulkScanService {
         Map<String, String> inputFieldsMap = getOcrDataFieldAsMap(inputFieldsList);
 
         List<String> unknownFieldsList = null;
-
-        BulkScanFormValidationConfigManager.ValidationConfig validationConfig =
-                configManager.getValidationConfig(formType);
-
         Map<String, Object> populatedMap =
                 (Map<String, Object>)
                         BulkScanTransformHelper.transformToCaseData(
@@ -220,12 +229,17 @@ public class BulkScanFL401Service implements BulkScanService {
                                 inputFieldsMap);
 
         populatedMap.put(SCAN_DOCUMENTS, transformScanDocuments(bulkScanTransformationRequest));
-
-        Map<String, String> caseTypeAndEventId =
-                transformConfigManager.getTransformationConfig(formType).getCaseFields();
-
         bulkScanFL401ConditionalTransformerService.transform(populatedMap, inputFieldsMap);
-
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        populatedMap.put(
+            SCAN_DOCUMENTS,
+            objectMapper.convertValue(BulkScanC100ConditionalTransformerService
+                                          .transformScanDocuments(bulkScanTransformationRequest), List.class));
+        populatedMap.put("caseTypeOfApplication", "FL401");
+        populatedMap.put("courtName", getNearestFamilyCourt(inputFieldsMap.get("applicant_Address_Postcode")));
+        Map<String, String> caseTypeAndEventId =
+            transformConfigManager.getTransformationConfig(formType).getCaseFields();
         BulkScanTransformationResponse.BulkScanTransformationResponseBuilder builder =
                 BulkScanTransformationResponse.builder()
                         .caseCreationDetails(
@@ -234,7 +248,8 @@ public class BulkScanFL401Service implements BulkScanService {
                                         .eventId(caseTypeAndEventId.get(EVENT_ID))
                                         .caseData(populatedMap)
                                         .build());
-
+        BulkScanFormValidationConfigManager.ValidationConfig validationConfig =
+            configManager.getValidationConfig(formType);
         if (nonNull(validationConfig)) {
             unknownFieldsList =
                     bulkScanValidationHelper.findUnknownFields(
@@ -248,18 +263,19 @@ public class BulkScanFL401Service implements BulkScanService {
     }
 
     private List<String> validateInputDate(
-            List<OcrDataField> ocrDataFields, String fieldName, String message) {
+        List<OcrDataField> ocrDataFields, String day, String month, String year, String message) {
 
         final Map<String, String> ocrDataFieldsMap = getOcrDataFieldAsMap(ocrDataFields);
 
         if (null != ocrDataFieldsMap
-                && ocrDataFieldsMap.containsKey(fieldName)
-                && hasText(ocrDataFieldsMap.get(fieldName))) {
-            String date = ocrDataFieldsMap.get(fieldName);
-
+                && ocrDataFieldsMap.containsKey(day)
+                && hasText(ocrDataFieldsMap.get(day)) && ocrDataFieldsMap.containsKey(month)
+                && hasText(ocrDataFieldsMap.get(month))
+                && ocrDataFieldsMap.containsKey(year) && hasText(ocrDataFieldsMap.get(year))) {
+            String date = ocrDataFieldsMap.get(year) + "-" + ocrDataFieldsMap.get(month) + "-" + ocrDataFieldsMap.get(day);
             return validateDate(Objects.requireNonNull(date), message);
         }
-        return Collections.emptyList();
+        return List.of(String.format(VALID_DATE_WARNING_MESSAGE, message));
     }
 
     private List<String> validateDate(String date, String fieldName) {
@@ -271,4 +287,24 @@ public class BulkScanFL401Service implements BulkScanService {
         }
         return Collections.emptyList();
     }
+
+    public String getNearestFamilyCourt(String postCode) {
+        ServiceArea serviceArea = null;
+        try {
+            serviceArea = courtFinderApi
+                .findClosestDomesticAbuseCourtByPostCode(postCode);
+
+        } catch (Exception e) {
+            log.error("CourtFinderService.getNearestFamilyCourt() method is throwing exception : {}",e.getMessage());
+        }
+        Court court = null;
+        if (serviceArea != null
+            && !serviceArea.getCourts().isEmpty()) {
+            court = courtFinderApi.getCourtDetails(serviceArea.getCourts()
+                                                       .get(0)
+                                                       .getCourtSlug());
+        }
+        return null != court ? court.getCourtName() : null;
+    }
+
 }

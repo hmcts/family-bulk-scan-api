@@ -71,10 +71,10 @@ public final class BulkScanFl401Constants {
     public static final String DETERREDOR_PREVENTED = "deterredOrPrevented";
     public static final String DELIVERATELY_EVADING_SERVICE = "deliberatelyEvadingService";
     public static final String ATTEND_HEARING_TABLE = "attendingTheHearingTable";
-    public static final String SPECIAL_MEASURE_AT_COURT_ROW_1 = "specialMeasureAtCourt_Row1";
-    public static final String SPECIAL_MEASURE_AT_COURT_ROW_2 = "specialMeasureAtCourt_Row2";
-    public static final String SPECIAL_MEASURE_AT_COURT_ROW_3 = "specialMeasureAtCourt_Row3";
-    public static final String SPECIAL_MEASURE_AT_COURT_ROW_4 = "specialMeasureAtCourt_Row4";
+    public static final String SPECIAL_MEASURE_AT_COURT_ROW_1 = "SpecialMeasureAtCourt_Row1";
+    public static final String SPECIAL_MEASURE_AT_COURT_ROW_2 = "SpecialMeasureAtCourt_Row2";
+    public static final String SPECIAL_MEASURE_AT_COURT_ROW_3 = "SpecialMeasureAtCourt_Row3";
+    public static final String SPECIAL_MEASURE_AT_COURT_ROW_4 = "SpecialMeasureAtCourt_Row4";
     public static final String SPECIAL_MEASURE_AT_COURT = "specialMeasureAtCourt";
     public static final String SPACE = "";
     public static final String APPLICANT_ADDRESS_POSTCODE = "applicant_Address_Postcode";
@@ -92,11 +92,11 @@ public final class BulkScanFl401Constants {
     public static final String APPLICANT_ADDRESS_TOWN_OR_CITY = "applicant_Address_TownOrCity";
     public static final String APPLICANT_ADDRESS_COUNTY = "applicant_Address_County";
     public static final String ADDRESS = "address";
-    public static final String ADDRESS_LINE1 = "AddressLine1";
-    public static final String ADDRESS_LINE2 = "AddressLine2";
-    public static final String POSTTOWN = "PostTown";
-    public static final String COUNTY = "County";
-    public static final String POSTCODE = "PostCode";
+    public static final String ADDRESS_LINE1 = "addressLine1";
+    public static final String ADDRESS_LINE2 = "addressLine2";
+    public static final String POSTTOWN = "postTown";
+    public static final String COUNTY = "county";
+    public static final String POSTCODE = "postCode";
     public static final String APPLICANT_PHONE_NUMBER = "applicant_PhoneNumber";
     public static final String APPLICANT_EMAIL = "applicant_Email";
     public static final String APPLICANT_PREFER_TO_BE_CONTACTED = "applicant_PreferToBeContacted";
@@ -112,9 +112,9 @@ public final class BulkScanFl401Constants {
     public static final String APPLICANT_RESPONDENT_RELATIONSHIP_DATE =
             "Applicant respondent relationship %s date";
     public static final String APPLICANT_RESPONDENT_RELATIONSHIP_FIELDS =
-            "applicantRespondent_Relationship_0[1-9]";
+            "appliantRespondent_Relationship_[1-9]";
     public static final String APPLICANT_RESPONDENT_RELATIONSHIP_OPTIONS_FIELDS =
-            "applicantRespondent_Relationship_[1,2][0-9,0-3]";
+            "appliantRespondent_Relationship_[1,2][0-9,0-3]";
     public static final String APPLICANT_MUST_HAVE_RELATIONSHIP_MESSAGE =
             "Section %s - Applicant must have a relationship with the respondent";
 
@@ -130,57 +130,57 @@ public final class BulkScanFl401Constants {
     public static final String FIELD_SUMMARY_PREVIOUS_MARRIED = "Previous Married";
 
     public static final String RESPONDENT_RELATIONSHIP_START_DATE_FIELD =
-            "applicantRespondent_Relationship_StartDate";
+            "appliantRespondent_Relationship_StartDate";
     public static final String RESPONDENT_RELATIONSHIP_END_DATE_FIELD =
-            "applicantRespondent_Relationship_EndDate";
+            "appliantRespondent_Relationship_EndDate";
     public static final String RESPONDENT_PREVIOUS_MARRIED_DATE_FIELD =
-            "applicantRespondent_PreviousMarried_Date";
+            "appliantRespondent_PreviousMarried_Date";
     public static final String RESPONDENT_MARRIED_CIVIL_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_01";
+            "appliantRespondent_Relationship_1";
     public static final String RESPONDENT_FORMERLY_MARRIED_CIVIL_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_02";
+            "appliantRespondent_Relationship_2";
     public static final String RESPONDENT_ENGAGED_PROPOSED_CIVIL_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_03";
+            "appliantRespondent_Relationship_3";
     public static final String RESPONDENT_FORMERLY_ENGAGED_PROPOSED_CIVIL_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_04";
+            "appliantRespondent_Relationship_4";
     public static final String RESPONDENT_LIVE_TOGETHER_AS_COUPLE_FIELD =
-            "applicantRespondent_Relationship_05";
+            "appliantRespondent_Relationship_5";
     public static final String RESPONDENT_FORMERLY_LIVE_TOGETHER_AS_COUPLE_FIELD =
-            "applicantRespondent_Relationship_06";
+            "appliantRespondent_Relationship_6";
     public static final String RESPONDENT_BOY_GIRL_FRIEND_PARTNER_LIVEWITHME_FIELD =
-            "applicantRespondent_Relationship_07";
+            "appliantRespondent_Relationship_7";
     public static final String RESPONDENT_FORMER_BOY_GIRL_FRIEND_PARTNER_LIVEWITHME_FIELD =
-            "applicantRespondent_Relationship_08";
+            "appliantRespondent_Relationship_8";
     public static final String APPLICANT_RESPONDENT_OTHER_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_09";
+            "appliantRespondent_Relationship_9";
     public static final String APPLICANT_RESPONDENT_FATHER_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_10";
+            "appliantRespondent_Relationship_10";
     public static final String APPLICANT_RESPONDENT_MOTHER_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_11";
+            "appliantRespondent_Relationship_11";
     public static final String APPLICANT_RESPONDENT_SON_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_12";
+            "appliantRespondent_Relationship_12";
     public static final String APPLICANT_RESPONDENT_DAUGHTER_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_13";
+            "appliantRespondent_Relationship_13";
     public static final String APPLICANT_RESPONDENT_BROTHER_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_14";
+            "appliantRespondent_Relationship_14";
     public static final String APPLICANT_RESPONDENT_SISTER_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_15";
+            "appliantRespondent_Relationship_15";
     public static final String APPLICANT_RESPONDENT_GRANDFATHER_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_16";
+            "appliantRespondent_Relationship_16";
     public static final String APPLICANT_RESPONDENT_GRANDMOTHER_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_17";
+            "appliantRespondent_Relationship_17";
     public static final String APPLICANT_RESPONDENT_UNCLE_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_18";
+            "appliantRespondent_Relationship_18";
     public static final String APPLICANT_RESPONDENT_AUNT_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_19";
+            "appliantRespondent_Relationship_19";
     public static final String APPLICANT_RESPONDENT_NEPHEW_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_20";
+            "appliantRespondent_Relationship_20";
     public static final String APPLICANT_RESPONDENT_NIECE_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_21";
+            "appliantRespondent_Relationship_21";
     public static final String APPLICANT_RESPONDENT_COUSIN_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_22";
+            "appliantRespondent_Relationship_22";
     public static final String APPLICANT_RESPONDENT_OTHER_SPECIFY_RELATIONSHIP_FIELD =
-            "applicantRespondent_Relationship_23";
+            "appliantRespondent_Relationship_23";
     public static final String CCD_RELATIONSHIP_TO_RESPONDENT_TABLE =
             "relationshipToRespondentTable";
     public static final String CCD_RELATIONSHIP_DATE_COMPLEX_START_DATE_FIELD =

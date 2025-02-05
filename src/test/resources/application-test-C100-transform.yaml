@@ -6,7 +6,7 @@ uk:
           C100:
             caseFields:
               CASE_TYPE_ID: PRLAPPS
-              EVENT_ID: create-case-privatelaw-bs
+              EVENT_ID: create-case-privatelaw-bs-c100
             caseDataFields:
               applicants:
                 - value:
@@ -88,8 +88,8 @@ uk:
                     respondentsRelationshipToChild: child4_respondent1_relationship
               miamPreviousAttendanceChecklist: NoMIAM_PreviousAttendenceReason
               miamOtherGroundsChecklist: NoMIAM_otherExceptions
-              childrenKNownToLocalAuthority: childrenServicesAuthority
-              childrenKNownToLocalAuthorityTextArea: child1_localAuthority_or_socialWorker
+              childrenKnownToLocalAuthority: childrenServicesAuthority
+              childrenKnownToLocalAuthorityTextArea: child1_localAuthority_or_socialWorker
               childrenSubjectOfChildProtectionPlan: subject_to_childProtectionPlan
               parentalResponsibilityDetails: parentalResponsibilityDetails
               childrenOfSameParent:  children_of_same_parent

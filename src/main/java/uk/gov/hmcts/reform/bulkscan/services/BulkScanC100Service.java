@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import uk.gov.hmcts.reform.bulkscan.model.CaseCreationDetails;
 import uk.gov.hmcts.reform.bulkscan.model.FormType;
 import uk.gov.hmcts.reform.bulkscan.model.OcrDataField;
 
+@Slf4j
 @Service
 public class BulkScanC100Service implements BulkScanService {
 
@@ -49,35 +52,41 @@ public class BulkScanC100Service implements BulkScanService {
         // Validating the Fields..
         Map<String, String> inputFieldMap = getOcrDataFieldAsMap(bulkRequest.getOcrdatafields());
         BulkScanFormValidationConfigManager.ValidationConfig validationConfig =
-                configManager.getValidationConfig(FormType.C100);
+            configManager.getValidationConfig(FormType.C100);
 
         BulkScanValidationResponse response =
                 bulkScanValidationHelper.validateMandatoryAndOptionalFields(
                         bulkRequest.getOcrdatafields(),
-                        configManager.getValidationConfig(FormType.C100));
+                        validationConfig);
+        // Validating the Fields..child related fields
         response.addErrors(bulkScanC100ValidationService.doChildRelatedValidation(inputFieldMap));
-        response.addErrors(
-                bulkScanC100ValidationService.doPermissionRelatedFieldValidation(inputFieldMap));
 
-        response.addErrors(
-                bulkScanC100ValidationService.validateOtherProceedingFields(
-                        inputFieldMap, validationConfig));
+        // Validating the Fields..permission related fields
+        response.addErrors(bulkScanC100ValidationService.doPermissionRelatedFieldValidation(inputFieldMap));
 
+        // Validating the Fields..other proceeding fields
+        response.addErrors(bulkScanC100ValidationService.validateOtherProceedingFields(inputFieldMap, validationConfig));
+
+        //Dependancy warnings
         response.addWarning(
                 dependencyValidationService.getDependencyWarnings(inputFieldMap, FormType.C100));
 
+        //Dependancy warnings - straight dependent fields
         response.addWarning(
                 dependencyValidationService.validateStraightDependentFields(
                         bulkRequest.getOcrdatafields()));
 
+        // Validating the Fields..Attending Miam
         bulkScanC100ValidationService.validateAttendMiam(bulkRequest.getOcrdatafields(), response);
 
+        // Validating the Fields..Applicant Address
         bulkScanC100ValidationService.validateApplicantAddressFiveYears(
                 bulkRequest.getOcrdatafields(), response);
+
         bulkScanC100Section6ValidationService.validate(bulkRequest, response);
 
-        response.addErrors(
-                bulkScanC100ValidationService.validateAttendingTheHearing(inputFieldMap));
+        // Validating the Fields..Attending the Hearing
+        response.addErrors(bulkScanC100ValidationService.validateAttendingTheHearing(inputFieldMap));
 
         response.changeStatus();
 
@@ -92,10 +101,9 @@ public class BulkScanC100Service implements BulkScanService {
 
         Map<String, String> inputFieldsMap =
                 inputFieldsList.stream()
-                        .filter(ocrDataField -> StringUtils.isNotEmpty(ocrDataField.getName()))
-                        .collect(
-                                Collectors.toMap(
-                                        ocrDataField -> ocrDataField.getName(), this::getValue));
+                        .filter(ocrDataField -> StringUtils.isNotEmpty(ocrDataField.getName())
+                            && StringUtils.isNotEmpty(ocrDataField.getValue()))
+                        .collect(Collectors.toMap(OcrDataField::getName, this::getValue));
 
         Map<String, Object> populatedMap =
                 (Map<String, Object>)
@@ -105,12 +113,12 @@ public class BulkScanC100Service implements BulkScanService {
                                                 .getTransformationConfig(FormType.C100)
                                                 .getCaseDataFields()),
                                 inputFieldsMap);
-
+        populatedMap.remove("otherChildrenNotInTheCaseTable");
         bulkScanC100ConditionalTransformerService.transform(
                 populatedMap, inputFieldsMap, bulkScanTransformationRequest);
         Map<String, String> caseTypeAndEventId =
                 transformConfigManager.getTransformationConfig(FormType.C100).getCaseFields();
-
+        log.info("Populated map {}", populatedMap);
         return BulkScanTransformationResponse.builder()
                 .caseCreationDetails(
                         CaseCreationDetails.builder()

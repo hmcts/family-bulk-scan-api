@@ -6,25 +6,29 @@ uk:
           FL401:
             - groupRelationshipWithRespondent:
               dependentFields:
-                - applicantRespondent_Relationship_StartDate
+                - relationship_Start_DD
+                - relationship_Start_MM
+                - relationship_Start_YYYY
               dependentFieldValue: "*"
-              groupFieldName: applicantRespondent_Relationship_09
+              groupFieldName: appliantRespondent_Relationship_9
               groupValidationValue: "Yes"
               requiredFieldCount: 1
               sectionName: "4.2 - Relationship Start Date cannot be null"
             - applyingWithoutGivingNotice:
               dependentFields:
-                - riskOfSignificantHarm
-                - deterredOrPrevented
-                - deliberatelyEvadingService
-              dependentFieldValue: "Yes"
+                - orderWithoutGivingNoticeReason1
+                - orderWithoutGivingNoticeReason2
+                - orderWithoutGivingNoticeReason3
+              dependentFieldValue: "*"
               groupFieldName: orderWithout_GivingNotice
               groupValidationValue: "Yes"
               requiredFieldCount: 1
               sectionName: "1.3 - Why do you want to apply without giving notice to the respondent?"
             - bailCondition:
               dependentFields:
-                - respondent_BailConditionsEndDate
+                - respondentBailConditions_EndDate_Day
+                - respondentBailConditions_EndDate_Month
+                - respondentBailConditions_EndDate_Year
               dependentFieldValue: "*"
               groupFieldName: respondentBailConditions
               groupValidationValue: "Yes"
@@ -40,10 +44,10 @@ uk:
               sectionName: "8 - going To Court"
             - interpreterNeededAtCourt:
               dependentFields:
-                - interpreterNeededAtCourt_Language
-                - interpreterNeededAtCourt_Dialect
+                - InterpreterNeededAtCourt_Language
+                - InterpreterNeededAtCourt_Dialect
               dependentFieldValue: "*"
-              groupFieldName: interpreterNeededAtCourt
+              groupFieldName: InterpreterNeededAtCourt
               groupValidationValue: "Yes"
               requiredFieldCount: 1
               sectionName: "8 - going To Court"
@@ -65,22 +69,24 @@ uk:
                 - occupationOrderAddress_SecondLine
                 - occupationOrderAddress_TownOrCity
                 - occupationOrderAddress_Postcode
-                - occupationOrderAddress_CurrentOccupant
-                - occupationOrderAddress_CurrentOccupant_Others
+                - occupationOrderAddress_CurrentOccupant_applicant
+                - occupationOrderAddress_CurrentOccupant_respondent
+                - occupationOrderAddress_CurrentOccupant_other
+                - occupationOrderAddress_CurrentOccupant_others
                 - occupationOrderAddress_PreviousOccupant
               dependentFieldValue: "*"
-              groupFieldName: applyingForOccupationOrder
+              groupFieldName: ApplyingForOccupationOrder
               groupValidationValue: "Yes"
               requiredFieldCount: 2
               sectionName: "To what address do you want the occupation order to apply?"
             - occupationOrderIntendedOccupantGroup:
               dependentFields:
-                - occupationOrderAddress_CurrentOccupant_Others
+                - occupationOrderAddress_CurrentOccupant_others
               dependentFieldValue: "*"
-              groupFieldName: occupationOrderAddress_CurrentOccupant
-              groupValidationValue: "Someone else – please specify"
+              groupFieldName: occupationOrderAddress_CurrentOccupant_other
+              groupValidationValue: "Others"
               requiredFieldCount: 1
-              sectionName: "Someone else – please specify."
+              sectionName: "Occupation order - Current occupant -> Someone else – please specify."
             - occupationOrderIntendedOccupantGroup:
               dependentFields:
                 - occupationOrderAddress_IntendedOccupant
@@ -142,23 +148,6 @@ uk:
               sectionName: "Someone else – please specify"
             - yourFamilyGroup:
               dependentFields:
-                - applicationFor_YouOnly
-                - applicationFor_YourFamily
-                - family_childrenDetails_row1
-                - family_childrenDetails_row2
-                - family_childrenDetails_row3
-                - family_childrenDetails_row4
-                - OngoingFamilyCourtProceeding
-                - OngoingFamilyCourtProceeding_row1
-                - OngoingFamilyCourtProceeding_row2
-                - OngoingFamilyCourtProceeding_row3
-              dependentFieldValue: "*"
-              groupFieldName: needForParentalResponsiblity
-              groupValidationValue: "Yes"
-              requiredFieldCount: 1
-              sectionName: "5 - Who is this application for?"
-            - yourFamilyGroup:
-              dependentFields:
                 - family_childrenDetails_row1
                 - family_childrenDetails_row2
                 - family_childrenDetails_row3
@@ -179,4 +168,12 @@ uk:
               groupValidationValue: "Yes"
               requiredFieldCount: 1
               sectionName: "5.4 - Family court proceedings details"
+            - yourFamilyGroup:
+              dependentFields:
+                - ApplyingForOccupationOrder
+              dependentFieldValue: "*"
+              groupFieldName: orderApplyingFor_occupation
+              groupValidationValue: "occupationOrder"
+              requiredFieldCount: 1
+              sectionName: "7.1 - Are you applying for an occupation order?"
 
